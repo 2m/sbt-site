@@ -1,10 +1,10 @@
 name := "scaladoc subproject test"
 
-scalaVersion in ThisBuild := "2.10.6"
+scalaVersion in ThisBuild := "2.12.8"
 
 //#subprojects
-lazy val cats = project.in(file("cats"))
-lazy val kittens = project.in(file("kittens")).dependsOn(cats)
+lazy val cats = project.in(file("cats")).enablePlugins(GenJavadocPlugin)
+lazy val kittens = project.in(file("kittens")).dependsOn(cats).enablePlugins(GenJavadocPlugin)
 
 //#subprojects
 
@@ -12,12 +12,16 @@ lazy val kittens = project.in(file("kittens")).dependsOn(cats)
 lazy val root = project.in(file("."))
   .settings(
     siteSubdirName in ScalaUnidoc := "api",
-    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc)
+    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
+    siteSubdirName in JavaUnidoc := "japi",
+    addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
   )
-  .enablePlugins(ScalaUnidocPlugin)
+  .enablePlugins(ScalaUnidocPlugin, JavaUnidocPlugin)
   .aggregate(cats, kittens)
 //#unidoc-site
   .aggregate(siteWithScaladoc, siteWithScaladocAlt)
+
+Global / unidocGenjavadocVersion := "0.13"
 
 //#scaladoc-site
 // Define a `Configuration` for each project.
